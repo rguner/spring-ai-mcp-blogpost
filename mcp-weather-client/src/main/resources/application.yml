@@ -3,11 +3,32 @@ spring:
     name: mcp
   main:
     web-application-type: none
-  
+    allow-bean-definition-overriding: true
+
   ai:
-    # Set credentials for your Anthropic API account 
-    anthropic:
-      api-key: ${ANTHROPIC_API_KEY}
+    # Set credentials for your Anthropic API account
+    #anthropic:
+    #api-key: ${ANTHROPIC_API_KEY}
+    #openai:
+    #api-key: ${OPENAI_API_KEY:your-openai-api-key}
+    #chat:
+    #options:
+    #model: gpt-4o-mini
+    #openai:
+    #api-key: lm-studio
+    #chat:
+    #base-url: http://localhost:1234
+    #completions-path: /v1/chat/completions
+    #options:
+    #model: meta-llama-3.1-8b-instruct
+    openai:
+      api-key: ollama
+      chat:
+        base-url: http://localhost:11434
+        completions-path: /v1/chat/completions
+        options:
+          #model: gemma3:4b  -- gemma3:4b does not support tools
+          model: llama3.1:8b
 
     # Connect to the MCP Weather Server using streamable-http client transport
     mcp:
@@ -15,14 +36,15 @@ spring:
         streamable-http:
           connections:
             my-weather-server:
-              url: http://localhost:8080        
-        stdio:
-          connections:
-            brave-search:
-              command: npx
-              args:
-                - "-y"
-                - "@modelcontextprotocol/server-brave-search"        
+              url: http://localhost:8080
+              #stdio:
+              #connections:
+              #brave-search:
+              #command: npx.cmd
+              #args:
+              #  - "-y"
+              #  - "@modelcontextprotocol/server-brave-search"
 
 # Debug configuration (commented out)
 # debug: true
+

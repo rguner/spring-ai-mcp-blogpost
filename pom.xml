@@ -10,7 +10,7 @@
 	<packaging>pom</packaging>
 	<url>https://github.com/tzolov/spring-ai-mcp-blogpost</url>
 
-	<name>Spring AI</name>
+	<name>Spring AI Mcp Blogpost</name>
 	<description>Building AI applications with Spring Boot</description>
 	<licenses>
 		<license>
