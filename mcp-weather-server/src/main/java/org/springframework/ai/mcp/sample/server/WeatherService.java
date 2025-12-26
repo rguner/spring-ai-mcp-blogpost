@@ -42,9 +42,14 @@ import org.springframework.web.client.RestClient;
 @Service
 public class WeatherService {
 
-	private final RestClient restClient = RestClient.create();
+	private final RestClient restClientWithSslCheckDisabled;
+	// private final RestClient restClient; default with SSL check enabled
 
-	/**
+    public WeatherService(RestClient restClientWithSslCheckDisabled) {
+        this.restClientWithSslCheckDisabled = restClientWithSslCheckDisabled;
+    }
+
+    /**
 	 * The response format from the Open-Meteo API
 	 */
 	public record WeatherResponse(Current current) {
@@ -67,7 +72,7 @@ public class WeatherService {
 		// 0% progress
 		exchange.progressNotification(new ProgressNotification(progressToken, 0.0, 1.0, "Retrieving weather forecast"));
 
-		WeatherResponse weatherResponse = restClient.get()
+		WeatherResponse weatherResponse = restClientWithSslCheckDisabled.get()
 			.uri("https://api.open-meteo.com/v1/forecast?latitude={latitude}&longitude={longitude}&current=temperature_2m",
 					latitude, longitude)
 			.retrieve()
