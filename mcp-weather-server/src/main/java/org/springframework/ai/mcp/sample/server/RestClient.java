@@ -17,31 +17,22 @@ import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 @Configuration
 public class RestClient {
 
-    @Bean
-    public org.springframework.web.client.RestClient restClientWithSslCheckDisabled() throws Exception {
-        SSLContext sslContext = SSLContextBuilder.create()
-                .loadTrustMaterial(new TrustAllStrategy())
-                .build();
+	@Bean
+	public org.springframework.web.client.RestClient restClientWithSslCheckDisabled() throws Exception {
+		SSLContext sslContext = SSLContextBuilder.create().loadTrustMaterial(new TrustAllStrategy()).build();
 
-        SSLConnectionSocketFactory sslSocketFactory = new SSLConnectionSocketFactory(
-                sslContext,
-                NoopHostnameVerifier.INSTANCE
-        );
+		SSLConnectionSocketFactory sslSocketFactory = new SSLConnectionSocketFactory(sslContext,
+				NoopHostnameVerifier.INSTANCE);
 
-        PoolingHttpClientConnectionManager connectionManager =
-                PoolingHttpClientConnectionManagerBuilder.create()
-                        .setSSLSocketFactory(sslSocketFactory)
-                        .build();
+		PoolingHttpClientConnectionManager connectionManager = PoolingHttpClientConnectionManagerBuilder.create()
+			.setSSLSocketFactory(sslSocketFactory)
+			.build();
 
-        CloseableHttpClient httpClient = HttpClients.custom()
-                .setConnectionManager(connectionManager)
-                .build();
+		CloseableHttpClient httpClient = HttpClients.custom().setConnectionManager(connectionManager).build();
 
-        HttpComponentsClientHttpRequestFactory requestFactory =
-                new HttpComponentsClientHttpRequestFactory(httpClient);
+		HttpComponentsClientHttpRequestFactory requestFactory = new HttpComponentsClientHttpRequestFactory(httpClient);
 
-        return org.springframework.web.client.RestClient.builder()
-                .requestFactory(requestFactory)
-                .build();
-    }
+		return org.springframework.web.client.RestClient.builder().requestFactory(requestFactory).build();
+	}
+
 }

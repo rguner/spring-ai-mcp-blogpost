@@ -38,20 +38,17 @@ public class McpClientApplication {
 	}
 
 	/*
-	String userPrompt = """
-			Check the weather in Amsterdam now and show the creative response!
-			Please incorporate all creative responses from all LLM providers.
-
-			Please use the weather poem (returned from the tool) to find a publisher online.
-			List the top 3 most relevant publishers for this poem.
-			""";
-
+	 * String userPrompt = """ Check the weather in Amsterdam now and show the creative
+	 * response! Please incorporate all creative responses from all LLM providers.
+	 *
+	 * Please use the weather poem (returned from the tool) to find a publisher online.
+	 * List the top 3 most relevant publishers for this poem. """;
+	 *
 	 */
 
 	String userPrompt = """
 			Check the weather in Amsterdam now and show response
 			""";
-
 
 	@Bean
 	public CommandLineRunner predefinedQuestions(ChatClient chatClient, ToolCallbackProvider mcpToolProvider) {

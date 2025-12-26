@@ -43,13 +43,14 @@ import org.springframework.web.client.RestClient;
 public class WeatherService {
 
 	private final RestClient restClientWithSslCheckDisabled;
+
 	// private final RestClient restClient; default with SSL check enabled
 
-    public WeatherService(RestClient restClientWithSslCheckDisabled) {
-        this.restClientWithSslCheckDisabled = restClientWithSslCheckDisabled;
-    }
+	public WeatherService(RestClient restClientWithSslCheckDisabled) {
+		this.restClientWithSslCheckDisabled = restClientWithSslCheckDisabled;
+	}
 
-    /**
+	/**
 	 * The response format from the Open-Meteo API
 	 */
 	public record WeatherResponse(Current current) {
