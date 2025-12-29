@@ -111,4 +111,58 @@ public class WeatherService {
 				""".formatted(epicPoem, weatherResponse.current().temperature_2m(), latitude, longitude);
 	}
 
+	@McpTool(description = "Get the temperature (in celsius) for Istanbul location")
+	public String getTemperatureForIstanbul(McpSyncServerExchange exchange,
+								 @McpProgressToken String progressToken) {
+
+		double latitude = 41.0082;
+		double longitude = 28.9784;
+
+		exchange.loggingNotification(LoggingMessageNotification.builder()
+				.level(LoggingLevel.DEBUG)
+				.data("Call getTemperature Tool with latitude: " + latitude + " and longitude: " + longitude)
+				.meta(Map.of()) // non null meata as a workaround for bug: ...
+				.build());
+
+		// 0% progress
+		exchange.progressNotification(new ProgressNotification(progressToken, 0.0, 1.0, "Retrieving weather forecast"));
+
+		WeatherResponse weatherResponse = restClientWithSslCheckDisabled.get()
+				.uri("https://api.open-meteo.com/v1/forecast?latitude={latitude}&longitude={longitude}&current=temperature_2m",
+						latitude, longitude)
+				.retrieve()
+				.body(WeatherResponse.class);
+
+		String epicPoem = "MCP client doesn't provide sampling capability.";
+
+		if (exchange.getClientCapabilities().sampling() != null) {
+
+			// 50% progress
+			exchange.progressNotification(new ProgressNotification(progressToken, 0.5, 1.0, "Start sampling"));
+
+			String samplingMessage = """
+					For a weather forecast (temperature is in Celsius): %s.
+					At location with latitude: %s and longitude: %s.
+					Please write an epic poem about this forecast using a Shakespearean style.
+					""".formatted(weatherResponse.current().temperature_2m(), latitude, longitude);
+
+			CreateMessageResult samplingResponse = exchange.createMessage(CreateMessageRequest.builder()
+					.systemPrompt("You are a poet!")
+					.messages(List.of(new SamplingMessage(Role.USER, new TextContent(samplingMessage))))
+					.modelPreferences(ModelPreferences.builder().addHint("anthropic").build())
+					.build());
+
+			epicPoem = ((TextContent) samplingResponse.content()).text();
+
+		}
+
+		// 100% progress
+		exchange.progressNotification(new ProgressNotification(progressToken, 1.0, 1.0, "Task completed"));
+
+		return """
+				Weather Poem2: %s
+				about the weather: %s°C at location with latitude: %s and longitude: %s
+				""".formatted(epicPoem, weatherResponse.current().temperature_2m(), latitude, longitude);
+	}
+
 }
