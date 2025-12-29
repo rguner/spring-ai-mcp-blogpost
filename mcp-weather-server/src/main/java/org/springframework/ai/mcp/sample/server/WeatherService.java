@@ -151,7 +151,7 @@ public class WeatherService {
 					.systemPrompt("You are a poet!")
 					.messages(List.of(new SamplingMessage(Role.USER, new TextContent(samplingMessage))))
 					.modelPreferences(ModelPreferences.builder().addHint("openai").build())
-							.maxTokens(10000)
+					.maxTokens(10000)
 					.build());
 
 			epicPoem = ((TextContent) samplingResponse.content()).text();
