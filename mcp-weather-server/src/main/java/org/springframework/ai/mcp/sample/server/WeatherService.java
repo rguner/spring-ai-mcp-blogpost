@@ -60,8 +60,8 @@ public class WeatherService {
 
 	@McpTool(description = "Get the temperature (in celsius) for a specific location")
 	public String getTemperature(McpSyncServerExchange exchange,
-			@McpToolParam(description = "The location latitude") double latitude,
-			@McpToolParam(description = "The location longitude") double longitude,
+			@McpToolParam(description = "The location latitude") Double latitude,
+			@McpToolParam(description = "The location longitude") Double longitude,
 			@McpProgressToken String progressToken) {
 
 		exchange.loggingNotification(LoggingMessageNotification.builder()
@@ -112,11 +112,11 @@ public class WeatherService {
 	}
 
 	@McpTool(description = "Get the temperature (in celsius) for Istanbul location")
-	public String getTemperatureForIstanbul(McpSyncServerExchange exchange,
-								 @McpProgressToken String progressToken) {
+	public String getTemperatureForIstanbul(McpSyncServerExchange exchange) {
 
 		double latitude = 41.0082;
 		double longitude = 28.9784;
+		String progressToken = "0";
 
 		exchange.loggingNotification(LoggingMessageNotification.builder()
 				.level(LoggingLevel.DEBUG)
@@ -146,10 +146,12 @@ public class WeatherService {
 					Please write an epic poem about this forecast using a Shakespearean style.
 					""".formatted(weatherResponse.current().temperature_2m(), latitude, longitude);
 
+
 			CreateMessageResult samplingResponse = exchange.createMessage(CreateMessageRequest.builder()
 					.systemPrompt("You are a poet!")
 					.messages(List.of(new SamplingMessage(Role.USER, new TextContent(samplingMessage))))
-					.modelPreferences(ModelPreferences.builder().addHint("anthropic").build())
+					.modelPreferences(ModelPreferences.builder().addHint("openai").build())
+							.maxTokens(10000)
 					.build());
 
 			epicPoem = ((TextContent) samplingResponse.content()).text();
@@ -163,6 +165,44 @@ public class WeatherService {
 				Weather Poem2: %s
 				about the weather: %s°C at location with latitude: %s and longitude: %s
 				""".formatted(epicPoem, weatherResponse.current().temperature_2m(), latitude, longitude);
+	}
+
+	@McpTool(description = "Get the temperature (in celsius) for Denizli location")
+	public String getTemperatureForDenizli(McpSyncServerExchange exchange) {
+
+		double latitude = 41.0082;
+		double longitude = 28.9784;
+		String progressToken = "0";
+
+		exchange.loggingNotification(LoggingMessageNotification.builder()
+				.level(LoggingLevel.DEBUG)
+				.data("Call getTemperature Tool with latitude: " + latitude + " and longitude: " + longitude)
+				.meta(Map.of()) // non null meata as a workaround for bug: ...
+				.build());
+
+		// 0% progress
+		exchange.progressNotification(new ProgressNotification(progressToken, 0.0, 1.0, "Retrieving weather forecast"));
+
+		WeatherResponse weatherResponse = restClientWithSslCheckDisabled.get()
+				.uri("https://api.open-meteo.com/v1/forecast?latitude={latitude}&longitude={longitude}&current=temperature_2m",
+						latitude, longitude)
+				.retrieve()
+				.body(WeatherResponse.class);
+
+		if (exchange.getClientCapabilities().sampling() != null) {
+
+			// 50% progress
+			exchange.progressNotification(new ProgressNotification(progressToken, 0.5, 1.0, "Start sampling"));
+
+
+		}
+
+		// 100% progress
+		exchange.progressNotification(new ProgressNotification(progressToken, 1.0, 1.0, "Task completed"));
+
+		return """
+				Weather: %s°C at location with latitude: %s and longitude: %s
+				""".formatted(weatherResponse.current().temperature_2m(), latitude, longitude);
 	}
 
 }
