@@ -1,4 +1,4 @@
-package org.springframework.ai.mcp.sample.server;
+package org.springframework.ai.mcp.sample.server.tools;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
